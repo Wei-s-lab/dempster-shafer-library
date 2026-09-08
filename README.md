@@ -4,7 +4,12 @@ Header-only C++17 implementation of [Dempster–Shafer](https://de.wikipedia.org
 belief functions (A. P. Dempster [[1]](#references), G. Shafer [[2]](#references)).
 It generalizes Bayesian probability by assigning mass to *sets* of hypotheses
 and representing uncertainty explicitly; Bayesian probability is the special case
-where all mass lies on singletons. Dempster also co-invented the EM algorithm.
+where all mass lies on singletons.
+
+> **License:** Proprietary — you may use, compile, and link the software
+> **unmodified** (including in commercial products). You may **not** modify or
+> redistribute altered source. See [LICENSE](LICENSE). Contributions that change
+> library source are not accepted under this license; please open an issue instead.
 
 ## Theory (core formulas)
 
@@ -34,9 +39,20 @@ Yager's rule (assigns $K$ to $\Theta$ instead of normalizing).
 |-------|----------------|
 | Focal sets | `ds::FocalSet<N>` (`std::bitset`) |
 | Mass functions | `ds::MassFunction<N>` — `mass`, `belief`, `plausibility`, `commonality`, `normalize`, `is_valid` |
-| Combination | `conflict`, `conjunctive_combination`, `disjunctive_combination`, `dempster_combination` (`operator*`), `yager_combination` |
+| Combination | `conflict`, `conjunctive_combination`, `disjunctive_combination`, `dempster_combination` (`operator+`), `yager_combination` |
 
 Umbrella header: `#include <ds/ds.hpp>`.
+
+**Notes**
+
+- `N` (frame size) is a compile-time constant. Combination is \(O(|F_1|\,|F_2|)\) over
+  focal sets; keep \(N\) and the number of focal elements modest (typical demos use \(N\le 8\)).
+- `set` / `add` throw `std::invalid_argument` if the mass is not finite or not in
+  `[0, 1]`. `add` also rejects an update that would push that focal set above 1.
+  The *total* mass across focal sets may still exceed 1 (then call `normalize()`).
+- `dempster_combination` (and `operator+`) throw `std::domain_error` on total conflict
+  (\(K = 1\)). Prefer the named function when clarity matters; `operator+` is ⊕.
+- Not included: discounting, pignistic transform, multi-source fold helpers, dynamic frames.
 
 ## Example
 
@@ -56,7 +72,7 @@ int main() {
     s1.set(a, 0.6); s1.set(theta, 0.4);
     s2.set(a, 0.7); s2.set(theta, 0.3);
 
-    auto fused = s1 * s2;  // dempster_combination
+    auto fused = ds::dempster_combination(s1, s2);
     std::cout << fused.mass(a) << " " << fused.belief(a) << "\n";  // 0.88 0.88
 }
 ```
@@ -70,10 +86,15 @@ Requires C++17 and CMake ≥ 3.16. **Unix-only** (not supported for Windows).
 g++ -std=c++17 -Iinclude example.cpp -o example
 # or: clang++ -std=c++17 -Iinclude example.cpp -o example
 
-# CMake (demo + tests)
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++   # or clang++
+# CMake (demo + tests) — run tests in Debug and Release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=g++
 cmake --build build -j
 ctest --test-dir build --output-on-failure
+
+cmake -S . -B build-release -DCMAKE_BUILD_TYPE=Release
+cmake --build build-release -j
+ctest --test-dir build-release --output-on-failure
+
 ./build/examples/ds_demo
 ```
 
@@ -86,7 +107,7 @@ examples/tests default **off**.
 
 ```cmake
 # A: source tree
-add_subdirectory(path/to/Dempster-Shafer-library)
+add_subdirectory(path/to/dempster-shafer-library)
 target_link_libraries(my_app PRIVATE ds::ds)
 
 # B: install + find_package
