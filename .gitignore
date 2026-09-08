@@ -1,0 +1,42 @@
+# CMake / local build trees
+/build/
+/build-*/
+build/
+build-clang/
+build-gcc/
+cmake-*-linux-*/
+cmake.tgz
+.cmake-tmp.tar.gz
+
+# Local toolchains downloaded for CI/dev (clang debs, portable cmake, conda, …)
+/tools/
+.cmake-tmp.tar.gz
+
+# Consumer smoke-test install trees (if left outside build/)
+/prefix/
+
+# Compilers / IDE
+compile_commands.json
+.cache/
+.clangd/
+.idea/
+.vscode/
+*.user
+*.swp
+*~
+
+# Objects and binaries
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.exe
+*.out
+ds_demo
+ds_*_tests
+consumer_main
+
+# OS junk
+.DS_Store
+Thumbs.db

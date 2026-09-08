@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using the metadata from this file.
+type: software
+title: Dempster-Shafer library
+abstract: >-
+  A header-only C++17 library implementing core Dempster–Shafer evidential
+  theory: frames of discernment, generic mass functions (BPA), belief/plausibility/
+  commonality, and combination rules (conjunctive, disjunctive, Dempster, Yager).
+authors:
+  - family-names: Wei
+    given-names: Zihang
+    email: zihang.wei@rwth-aachen.de
+    affiliation: Wei's Lab, London, UK
+    orcid: https://orcid.org/0009-0009-0455-9294
+version: 0.1.0
+date-released: "2026-09-08"
+repository-code: "https://github.com/zihangwei-rwth/Dempster-Shafer-library"
+url: "https://github.com/zihangwei-rwth/Dempster-Shafer-library"
+keywords:
+  - evidential theory
+references:
+  - type: article
+    title: Upper and Lower Probabilities Induced by a Multivalued Mapping
+    authors:
+      - family-names: Dempster
+        given-names: Arthur P.
+    year: 1967
+    journal: Annals of Mathematical Statistics
+    volume: "38"
+    issue: "2"
+    pages: 325-339
+    doi: 10.1214/aoms/1177698950
+  - type: book
+    title: A Mathematical Theory of Evidence
+    authors:
+      - family-names: Shafer
+        given-names: Glenn
+    year: 1976
+    publisher:
+      name: Princeton University Press
+      city: Princeton
+      country: US
