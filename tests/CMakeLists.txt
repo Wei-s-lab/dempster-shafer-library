@@ -4,6 +4,8 @@
 function(ds_add_test name source)
     add_executable(${name} ${source})
     target_link_libraries(${name} PRIVATE ds::ds)
+    # test_utils.hpp lives next to the sources; keep checks active in Release.
+    target_include_directories(${name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     add_test(NAME ${name} COMMAND ${name})
     set_tests_properties(${name} PROPERTIES
         LABELS "ds"
