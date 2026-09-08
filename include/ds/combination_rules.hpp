@@ -95,9 +95,10 @@ MassFunction<FrameSize> yager_combination(const MassFunction<FrameSize>& m1,
     return out;
 }
 
-// Convenience operator: the orthogonal sum is Dempster's rule of combination.
+// Convenience alias for dempster_combination (orthogonal sum ⊕).
+// Prefer the named function in new code when clarity matters.
 template <std::size_t FrameSize>
-MassFunction<FrameSize> operator*(const MassFunction<FrameSize>& a,
+MassFunction<FrameSize> operator+(const MassFunction<FrameSize>& a,
                                   const MassFunction<FrameSize>& b)
 {
     return dempster_combination(a, b);
