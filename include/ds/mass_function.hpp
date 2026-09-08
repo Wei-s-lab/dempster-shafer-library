@@ -4,9 +4,21 @@
 
 #include <cmath>
 #include <cstddef>
+#include <stdexcept>
 #include <unordered_map>
 
 namespace ds {
+
+namespace detail {
+
+inline void require_mass_in_unit_interval(double mass)
+{
+    if (!std::isfinite(mass) || mass < 0.0 || mass > 1.0)
+        throw std::invalid_argument(
+            "ds::MassFunction: mass must be finite and in [0, 1]");
+}
+
+} // namespace detail
 
 // A basic probability assignment (BPA), also called a mass function.
 //
@@ -14,6 +26,10 @@ namespace ds {
 // FocalSet<FrameSize>) to a mass in [0, 1]. Only focal sets with non-zero
 // mass are stored. A valid BPA satisfies m(emptyset) == 0 and the masses of
 // all focal sets sum to 1.
+//
+// set/add require each argument to be finite and in [0, 1]. add also rejects
+// an update that would make that focal set's stored mass exceed 1. The total
+// mass across focal sets may still exceed 1 (call normalize() afterwards).
 template <std::size_t FrameSize>
 class MassFunction {
 public:
@@ -23,22 +39,32 @@ public:
     MassFunction() = default;
 
     // Add mass to a focal set, accumulating with any mass already there.
-    void add(const Set& focal, double mass)
+    void add(const Set& focal, double value)
     {
-        if (mass == 0.0)
+        detail::require_mass_in_unit_interval(value);
+        if (value == 0.0)
             return;
-        m_[focal] += mass;
+
+        const auto it = m_.find(focal);
+        const double current = it == m_.end() ? 0.0 : it->second;
+        const double next = current + value;
+        // Allow tiny FP overshoot from combination products; reject real overflow.
+        if (next > 1.0 + 1e-9)
+            throw std::invalid_argument(
+                "ds::MassFunction: add would make focal mass exceed 1");
+        m_[focal] = next > 1.0 ? 1.0 : next;
     }
 
     // Overwrite the mass of a focal set (removing it when set to zero).
-    void set(const Set& focal, double mass)
+    void set(const Set& focal, double value)
     {
-        if (mass == 0.0)
+        detail::require_mass_in_unit_interval(value);
+        if (value == 0.0)
         {
             m_.erase(focal);
             return;
         }
-        m_[focal] = mass;
+        m_[focal] = value;
     }
 
     // Mass assigned to a focal set (0 when it carries no mass).
